@@ -5,7 +5,7 @@ sg.theme('DarkBlue16')
 sg.set_options(font = 'Calibri 16')
 
 layout = [
-    [sg.Text('Network Automation Demo', key='Status')], 
+    [sg.Text('Network Automation Demo')], 
     [sg.Text('Enter your username'), sg.Input(size=(20,1), pad=(1,0))], 
     [sg.Text('Enter your password'), sg.Input(size=(20,1), pad=(2,0))], 
     [sg.Text('Enter the device'), sg.Input(size=(20,1), pad=(33,0))], 
