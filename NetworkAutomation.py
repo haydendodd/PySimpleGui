@@ -9,7 +9,7 @@ layout = [
     [sg.Text('Enter your username'), sg.Input(size=(30,1), pad=(1,0))], 
     [sg.Text('Enter your password'), sg.Input(size=(30,1), pad=(4,0))], 
     [sg.Text('Enter the device'), sg.Input(size=(30,1), pad=(42,0))], 
-    [sg.Text('Select Output'), sg.Combo(['Show Interfaces','Show CDP Neighbors','Show Switch Detail', 'Show Device Version', 'Show Boot', 'Show License Summary', 'Directory Flash'], pad=(61,0), size=(29,1))],
+    [sg.Text('Select Output'), sg.Combo(['Show Interfaces','Show CDP Neighbors','Show Switch Detail', 'Show Device Version', 'Show Boot', 'Show License Summary', 'Directory Flash', 'Other Command'], pad=(61,0), size=(29,1))],
     [sg.Button("SUBMIT"), sg.Button('CLOSE')]]
 
 window = sg.Window("Network Automation Project", layout)
@@ -82,5 +82,25 @@ while True:
                         sg.Print(output)
 
         window_1.close()
-         
+
+    if values[3] == 'Other Command':
+        window_2 = sg.Window('Enter the Command', [
+            [sg.T('Enter the command you would like to run')], 
+            [sg.Input()],
+            [sg.Button('SUBMIT'), sg.Button('CLOSE')]], disable_close=True)
+
+        while True:
+                event_2, values_2 = window_2.read()
+
+                if event_2 == sg.WIN_CLOSED or event_2 == 'CLOSE':
+                    break
+
+                if event_2 == 'SUBMIT':
+                    command = values_2[0]
+                    with ConnectHandler(**cisco1) as net_connect:
+                        output = net_connect.send_command(command)
+                    sg.Print(output)
+
+        window_2.close()
+
 window.close()
