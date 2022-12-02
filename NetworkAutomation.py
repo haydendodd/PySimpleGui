@@ -1,5 +1,6 @@
 from netmiko import ConnectHandler
 import PySimpleGUI as sg
+import json
 
 sg.theme('DarkBlue16')
 sg.set_options(font = 'Calibri 16')
@@ -27,10 +28,13 @@ while True:
     "password": values[1],}
 
     if values[3] == 'Show Interfaces':
-        command = "show int status"
+        command = "show ip int brief"
         with ConnectHandler(**cisco1) as net_connect:
-            output = net_connect.send_command(command)
-        sg.Print(output)
+            interfaces = net_connect.send_command(command, use_textfsm=True)
+        sg.Print(json.dumps(interfaces, indent=2))
+        #for interface in interfaces:
+            #if interface['proto'] == 'down':
+                #sg.Print(f"{interface['intf']} is down!")
 
     if values[3] == 'Show CDP Neighbors':
         command = "show cdp neighbors"
@@ -48,13 +52,20 @@ while True:
         command = "show version"
         with ConnectHandler(**cisco1) as net_connect:
             output = net_connect.send_command(command)
-        sg.Print(output)  
+            devices = net_connect.send_command(command, use_textfsm=True)
+        for device in devices:
+            global hardware
+            hardware = device['hardware']
+        sg.Print(output)
 
     if values[3] == 'Show Boot':
-        command = "show boot system"
-        with ConnectHandler(**cisco1) as net_connect:
-            output = net_connect.send_command(command)
-        sg.Print(output) 
+        if hardware == ['IOSv']:
+            command = "show boot"
+            with ConnectHandler(**cisco1) as net_connect:
+                output = net_connect.send_command(command)
+            sg.Print(output) 
+        else:
+            sg.Print('This did not work')
 
     if values[3] == 'Show License Summary':
         command = "show license summary"
@@ -75,11 +86,15 @@ while True:
                     break
 
                 if event_1 == 'SUBMIT':
-                    for i in range(1,int(values_1[0])+1):
-                        command = "dir flash-" + str(i) + ":"
-                        with ConnectHandler(**cisco1) as net_connect:
-                            output = net_connect.send_command(command)
-                        sg.Print(output)
+                    if hardware == ['IOSv']:
+                        #for i in range(1,int(values_1[0])+1):
+                            #command = "dir flash-" + str(i) + ":"
+                            #with ConnectHandler(**cisco1) as net_connect:
+                                #output = net_connect.send_command(command)
+                            #sg.Print(output)
+                        sg.Print('dir flash:')
+                    else:
+                        sg.Print('this did not work')
 
         window_1.close()
 
